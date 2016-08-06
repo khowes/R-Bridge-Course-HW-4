@@ -1,0 +1,79 @@
+---
+title: 'R Bridge HW #4'
+author: "Ken Howes"
+date: "August 5, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+# Get dataset of movie information and user ratings from IMDB.com.
+# Movies were selected for inclusion if they had a known length and had been rated by at least one imdb user. 
+
+# Explore the relationship between each movie's budget and it's popularity (as measured by the number of votes it received)
+# Explore the relationship between each movie's budget and it's quality (as measured by the overall rating it received)
+
+# Step 1: Get the data
+
+```
+# install.packages("RCurl")
+library(RCurl)
+library(ggplot2)
+
+url <- "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/ggplot2/movies.csv"
+
+imdb_data <- getURL(url)
+getwd()
+imdb_df <- read.csv(text=imdb_data, header=T, sep = ",", stringsAsFactors = FALSE)
+```
+
+## Step 2: Explore the data
+
+```
+# Explore data
+head(imdb_df)
+str(imdb_df)
+summary(imdb_df)
+
+```
+
+## Step 3: Plot the data
+
+```
+attach(imdb_df)
+par(mfcol=c(1,3))
+hist(imdb_df$budget)
+hist(imdb_df$rating)
+hist(imdb_df$votes)
+
+attach(imdb_df)
+par(mfcol=c(1,3))
+boxplot(imdb_df$budget)
+boxplot(imdb_df$rating)
+boxplot(imdb_df$votes)
+```
+
+# Is there a relationship between a movie's budget and it's rating?  
+# Do people like big-budget movies better than small-budget movies?
+```
+ggplot(data=imdb_df, aes(x=budget, y=rating)) + geom_point() + geom_smooth(method=lm,se=FALSE)
+
+# Apparently not, although I did get the following error message:
+# 1: Removed 53573 rows containing non-finite values (stat_smooth). 
+# 2: Removed 53573 rows containing missing values (geom_point).
+```
+
+# If you assume that the number of votes reflects a movie's popularity...
+# Is there a relationship between a movie's budget and the number of votes it receives?  
+# Are big-budget movies more popular than small budget movies?
+```
+ggplot(data=imdb_df, aes(x=budget, y=votes)) + geom_point() + geom_smooth(method=lm,se=FALSE)
+
+# Apparently yes, although I did get the following error message:
+# 1: Removed 53573 rows containing non-finite values (stat_smooth). 
+# 2: Removed 53573 rows containing missing values (geom_point).
+```
